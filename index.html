@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Fortune Wheel</title>
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #4ecca3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* Wheel Container */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            box-shadow: 
+                0 0 0 8px rgba(255,255,255,0.1),
+                0 0 20px rgba(0,0,0,0.5),
+                0 0 40px rgba(0,0,0,0.3);
+        }
+        
+        /* Pointer */
+        .pointer {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+            width: 30px;
+            height: 50px;
+            background: linear-gradient(to bottom, #ff6b6b, #ee5253);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 10;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+        
+        .pointer::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #4ecca3, #45b7a4);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 204, 163, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 204, 163, 0.4);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .button.secondary {
+            background: linear-gradient(135deg, #546de5, #778beb);
+            box-shadow: 0 4px 15px rgba(84, 109, 229, 0.3);
+        }
+        
+        .button.secondary:hover {
+            box-shadow: 0 6px 20px rgba(84, 109, 229, 0.4);
+        }
+        
+        /* Form Styles */
+        .form-container {
+            background-color: #232741;
+            border-radius: 15px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .form-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .form-title h2 {
+            color: #4ecca3;
+            font-size: 1.5rem;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-button:hover {
+            color: #ff6b6b;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #a3a3a3;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #3f3f5f;
+            background-color: #2c3154;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4ecca3;
+            box-shadow: 0 0 0 2px rgba(78, 204, 163, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .entry-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .entry-row input {
+            flex-grow: 1;
+        }
+        
+        .entry-row button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .entry-row button:hover {
+            background-color: #ee5253;
+            transform: scale(1.05);
+        }
+        
+        .add-entry-button {
+            background-color: #3f3f5f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .add-entry-button:hover {
+            background-color: #4a4a6b;
+        }
+        
+        /* Switch */
+        .switch-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #3f3f5f;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3f3f5f;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4ecca3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Winner Overlay */
+        .winner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            backdrop-filter: blur(8px);
+        }
+        
+        .winner-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .winner-content {
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.5s ease;
+        }
+        
+        .winner-overlay.active .winner-content {
+            transform: scale(1.1);
+        }
+        
+        .trophy-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .winner-title {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: #4ecca3;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .winner-name {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding: 20px 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(78, 204, 163, 0.3);
+        }
+        
+        /* Rigged indicator */
+        .rigged-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffd700;
+            font-size: 14px;
+            margin-top: 15px;
+            justify-content: center;
+            background-color: rgba(255, 215, 0, 0.1);
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+        
+        .rigged-indicator i {
+            font-size: 18px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 500px) {
+            .wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .winner-name {
+                font-size: 36px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <h1>Fortune Wheel</h1>
+    
+    <!-- Wheel -->
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="wheel" class="wheel"></canvas>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls">
+        <div class="button-container">
+            <button id="spin-button" class="button">Spin Wheel</button>
+            <button id="customize-button" class="button secondary">Customize</button>
+        </div>
+        <div id="rigged-indicator" class="rigged-indicator" style="display: none;">
+            <i class="fas fa-sparkles"></i>
+            <span>Wheel is rigged to land on: <strong id="rigged-winner-display"></strong></span>
+        </div>
+    </div>
+    
+    <!-- Customize Form (Hidden by default) -->
+    <div id="form-container" class="form-container" style="display: none;">
+        <div class="form-title">
+            <h2>Customize Wheel</h2>
+            <button id="close-form" class="close-button">&times;</button>
+        </div>
+        
+        <div class="form-group">
+            <label for="bulk-entries">Quick Add (one entry per line)</label>
+            <textarea id="bulk-entries" placeholder="Enter multiple entries, one per line"></textarea>
+            <button id="apply-bulk" class="add-entry-button">Apply</button>
+        </div>
+        
+        <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <label>Wheel Entries</label>
+                <button id="add-entry" class="add-entry-button">
+                    <i class="fas fa-plus"></i> Add Entry
+                </button>
+            </div>
+            <div id="entries-container">
+                <!-- Entries will be added here dynamically -->
+            </div>
+        </div>
+        
+        <div class="switch-container">
+            <label for="rig-switch">Rig the wheel</label>
+            <label class="switch">
+                <input type="checkbox" id="rig-switch">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div id="rigged-winner-container" class="form-group" style="display: none; margin-top: 15px;">
+            <label for="rigged-winner">Select winner</label>
+            <select id="rigged-winner">
+                <option value="">Select an entry</option>
+                <!-- Options will be added dynamically -->
+            </select>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button id="cancel-form" class="button secondary">Cancel</button>
+            <button id="save-form" class="button">Save Changes</button>
+        </div>
+    </div>
+    
+    <!-- Winner Overlay (Hidden by default) -->
+    <div id="winner-overlay" class="winner-overlay">
+        <div class="winner-content">
+            <div class="trophy-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h2 class="winner-title">Winner!</h2>
+            <div id="winner-name" class="winner-name">Option 1</div>
+            <button id="close-winner" class="button">Close</button>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initial entries
+            let entries = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6"];
+            let colors = [];
+            let riggedWinner = null;
+            let isSpinning = false;
+            
+            // Initialize the wheel
+            const canvas = document.getElementById('wheel');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            function setCanvasSize() {
+                const containerWidth = $('.wheel-container').width();
+                canvas.width = containerWidth;
+                canvas.height = containerWidth;
+            }
+            
+            // Generate colors for wheel segments
+            function generateColors(count) {
+                const newColors = [];
+                for (let i = 0; i < count; i++) {
+                    const hue = (i * (360 / count)) % 360;
+                    const saturation = 70 + Math.random() * 30; // 70-100%
+                    const lightness = 45 + Math.random() * 10; // 45-55%
+                    newColors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+                }
+                return newColors;
+            }
+            
+            // Draw the wheel
+            function drawWheel() {
+                if (entries.length === 0) return;
+                
+                const size = canvas.width;
+                const center = size / 2;
+                const radius = center - 5; // Accounting for border
+                const anglePerSegment = (2 * Math.PI) / entries.length;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, size, size);
+                
+                // Draw segments
+                entries.forEach((entry, i) => {
+                    const startAngle = i * anglePerSegment;
+                    const endAngle = (i + 1) * anglePerSegment;
+                    
+                    // Draw segment
+                    ctx.beginPath();
+                    ctx.moveTo(center, center);
+                    ctx.arc(center, center, radius, startAngle, endAngle);
+                    ctx.fillStyle = colors[i] || "#cccccc";
+                    ctx.fill();
+                    
+                    // Add gradient overlay
+                    const gradient = ctx.createRadialGradient(center, center, 0, center, center, radius);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.2)');
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    
+                    // Add inner shadow
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw text
+                    ctx.save();
+                    ctx.translate(center, center);
+                    ctx.rotate(startAngle + anglePerSegment / 2);
+                    ctx.textAlign = "right";
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = `bold ${Math.min(16, 300 / entries.length)}px sans-serif`;
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 4;
+                    ctx.fillText(entry, radius - 15, 5);
+                    ctx.restore();
+                });
+                
+                // Draw center circle
+                ctx.beginPath();
+                ctx.arc(center, center, 15, 0, 2 * Math.PI);
+                ctx.fillStyle = '#232741';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // Initialize wheel
+            function initWheel() {
+                setCanvasSize();
+                colors = generateColors(entries.length);
+                drawWheel();
+                updateRiggedIndicator();
+                populateEntries();
+            }
+            
+            // Spin the wheel
+            function spinWheel() {
+                if (isSpinning || entries.length === 0) return;
+                isSpinning = true;
+                
+                let winnerIndex = Math.floor(Math.random() * entries.length);
+                
+                // If rigged winner is set and exists in entries, use that
+                if (riggedWinner) {
+                    const riggedIndex = entries.indexOf(riggedWinner);
+                    if (riggedIndex !== -1) {
+                        winnerIndex = riggedIndex;
+                    }
+                }
+                
+                // Calculate rotation to land on winner
+                // The pointer is at top (270 degrees), so we need to adjust
+                const segmentAngle = 360 / entries.length;
+                const targetRotation = 3600 + (270 - (winnerIndex * segmentAngle + segmentAngle / 2));
+                
+                // Reset any previous rotation
+                $('.wheel').css('transition', 'none');
+                $('.wheel').css('transform', 'rotate(0deg)');
+                
+                // Force reflow
+                $('.wheel')[0].offsetHeight;
+                
+                // Set rotation with CSS transition
+                $('.wheel').css('transition', 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)');
+                $('.wheel').css('transform', `rotate(${targetRotation}deg)`);
+                
+                // Show winner after spin completes
+                setTimeout(function() {
+                    showWinner(entries[winnerIndex], colors[winnerIndex]);
+                    isSpinning = false;
+                }, 5000);
+            }
+            
+            // Show winner overlay
+            function showWinner(winner, color) {
+                // Set overlay background color with transparency
+                $('#winner-overlay').css('background-color', `${color}dd`);
+                $('#winner-name').text(winner);
+                
+                // Show overlay with animation
+                $('#winner-overlay').addClass('active');
+                
+                // Trigger confetti
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+            
+            // Update rigged indicator
+            function updateRiggedIndicator() {
+                if (riggedWinner) {
+                    $('#rigged-indicator').show();
+                    $('#rigged-winner-display').text(riggedWinner);
+                } else {
+                    $('#rigged-indicator').hide();
+                }
+            }
+            
+            // Populate entries in the form
+            function populateEntries() {
+                // Clear container
+                $('#entries-container').empty();
+                
+                // Add each entry
+                entries.forEach((entry, index) => {
+                    const entryRow = `
+                        <div class="entry-row" data-index="${index}">
+                            <input type="text" class="entry-input" value="${entry}" placeholder="Entry ${index + 1}">
+                            <button class="remove-entry"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    $('#entries-container').append(entryRow);
+                });
+                
+                // Update rigged winner dropdown
+                updateRiggedWinnerDropdown();
+            }
+            
+            // Update rigged winner dropdown
+            function updateRiggedWinnerDropdown() {
+                const $select = $('#rigged-winner');
+                $select.empty();
+                $select.append('<option value="">Select an entry</option>');
+                
+                entries.forEach((entry) => {
+                    if (entry.trim()) {
+                        const selected = entry === riggedWinner ? 'selected' : '';
+                        $select.append(`<option value="${entry}" ${selected}>${entry}</option>`);
+                    }
+                });
+            }
+            
+            // Event Handlers
+            
+            // Spin button
+            $('#spin-button').on('click', function() {
+                spinWheel();
+            });
+            
+            // Customize button
+            $('#customize-button').on('click', function() {
+                $('#form-container').show();
+                populateEntries();
+            });
+            
+            // Close form buttons
+            $('#close-form, #cancel-form').on('click', function() {
+                $('#form-container').hide();
+            });
+            
+            // Add entry button
+            $('#add-entry').on('click', function() {
+                const newIndex = entries.length;
+                entries.push("");
+                
+                const entryRow = `
+                    <div class="entry-row" data-index="${newIndex}">
+                        <input type="text" class="entry-input" placeholder="Entry ${newIndex + 1}">
+                        <button class="remove-entry"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                $('#entries-container').append(entryRow);
+            });
+            
+            // Remove entry button (using event delegation)
+            $('#entries-container').on('click', '.remove-entry', function() {
+                const $row = $(this).closest('.entry-row');
+                const index = $row.data('index');
+                
+                // Remove from DOM
+                $row.remove();
+                
+                // Remove from array (will be rebuilt on save)
+                
+                // If the rigged winner was removed, clear it
+                if (riggedWinner === entries[index]) {
+                    riggedWinner = null;
+                    $('#rig-switch').prop('checked', false);
+                    $('#rigged-winner-container').hide();
+                }
+                
+                updateRiggedWinnerDropdown();
+            });
+            
+            // Apply bulk entries
+            $('#apply-bulk').on('click', function() {
+                const bulkText = $('#bulk-entries').val().trim();
+                if (!bulkText) return;
+                
+                const newEntries = bulkText
+                    .split('\n')
+                    .map(entry => entry.trim())
+                    .filter(entry => entry.length > 0);
+                
+                if (newEntries.length > 0) {
+                    entries = newEntries;
+                    populateEntries();
+                    $('#bulk-entries').val('');
+                }
+            });
+            
+            // Rig switch
+            $('#rig-switch').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('#rigged-winner-container').show();
+                } else {
+                    $('#rigged-winner-container').hide();
+                    riggedWinner = null;
+                }
+            });
+            
+            // Save form
+            $('#save-form').on('click', function() {
+                // Collect entries from inputs
+                const newEntries = [];
+                $('.entry-input').each(function() {
+                    const value = $(this).val().trim();
+                    if (value) {
+                        newEntries.push(value);
+                    }
+                });
+                
+                // Ensure we have at least 2 entries
+                if (newEntries.length < 2) {
+                    alert("Please add at least 2 entries to the wheel");
+                    return;
+                }
+                
+                // Update entries
+                entries = newEntries;
+                
+                // Update rigged winner
+                if ($('#rig-switch').is(':checked')) {
+                    riggedWinner = $('#rigged-winner').val();
+                    if (!riggedWinner || !entries.includes(riggedWinner)) {
+                        riggedWinner = null;
+                    }
+                } else {
+                    riggedWinner = null;
+                }
+                
+                // Redraw wheel
+                colors = generateColors(entries.length);
+                drawWheel();
+                updateRiggedIndicator();
+                
+                // Hide form
+                $('#form-container').hide();
+            });
+            
+            // Close winner overlay
+            $('#close-winner').on('click', function() {
+                $('#winner-overlay').removeClass('active');
+            });
+            
+            // Handle window resize
+            $(window).on('resize', function() {
+                setCanvasSize();
+                drawWheel();
+            });
+            
+            // Initialize
+            initWheel();
+        });
+    </script>
+</body>
+</html>
