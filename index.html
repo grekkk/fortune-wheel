@@ -410,6 +410,10 @@
             <button id="spin-button" class="button">Spin Wheel</button>
             <button id="customize-button" class="button secondary">Customize</button>
         </div>
+        <div id="rigged-indicator" class="rigged-indicator" style="display: none;">
+            <i class="fas fa-sparkles"></i>
+            <span>Wheel is rigged to land on: <strong id="rigged-winner-display"></strong></span>
+        </div>
     </div>
     
     <!-- Customize Form (Hidden by default) -->
@@ -570,6 +574,7 @@
                 setCanvasSize();
                 colors = generateColors(entries.length);
                 drawWheel();
+                updateRiggedIndicator();
                 populateEntries();
             }
             
@@ -614,7 +619,7 @@
             // Show winner overlay
             function showWinner(winner, color) {
                 // Set overlay background color with transparency
-                $('#winner-overlay').css('background-color', `${color}dd`);
+                $('#winner-overlay').css('background-color', 'rgba(0,0,0,0.8)');
                 $('#winner-name').text(winner);
                 
                 // Show overlay with animation
@@ -626,6 +631,16 @@
                     spread: 70,
                     origin: { y: 0.6 }
                 });
+            }
+            
+            // Update rigged indicator
+            function updateRiggedIndicator() {
+                if (riggedWinner) {
+                    $('#rigged-indicator').show();
+                    $('#rigged-winner-display').text(riggedWinner);
+                } else {
+                    $('#rigged-indicator').hide();
+                }
             }
             
             // Populate entries in the form
@@ -774,6 +789,7 @@
                 // Redraw wheel
                 colors = generateColors(entries.length);
                 drawWheel();
+                updateRiggedIndicator();
                 
                 // Hide form
                 $('#form-container').hide();
