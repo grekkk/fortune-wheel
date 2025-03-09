@@ -358,24 +358,6 @@
             box-shadow: 0 0 30px rgba(78, 204, 163, 0.3);
         }
         
-        /* Rigged indicator */
-        .rigged-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #ffd700;
-            font-size: 14px;
-            margin-top: 15px;
-            justify-content: center;
-            background-color: rgba(255, 215, 0, 0.1);
-            padding: 8px 12px;
-            border-radius: 20px;
-        }
-        
-        .rigged-indicator i {
-            font-size: 18px;
-        }
-        
         /* Responsive */
         @media (max-width: 500px) {
             .wheel-container {
@@ -409,10 +391,6 @@
         <div class="button-container">
             <button id="spin-button" class="button">Spin Wheel</button>
             <button id="customize-button" class="button secondary">Customize</button>
-        </div>
-        <div id="rigged-indicator" class="rigged-indicator" style="display: none;">
-            <i class="fas fa-sparkles"></i>
-            <span>Wheel is rigged to land on: <strong id="rigged-winner-display"></strong></span>
         </div>
     </div>
     
@@ -574,7 +552,6 @@
                 setCanvasSize();
                 colors = generateColors(entries.length);
                 drawWheel();
-                updateRiggedIndicator();
                 populateEntries();
             }
             
@@ -631,16 +608,6 @@
                     spread: 70,
                     origin: { y: 0.6 }
                 });
-            }
-            
-            // Update rigged indicator
-            function updateRiggedIndicator() {
-                if (riggedWinner) {
-                    $('#rigged-indicator').show();
-                    $('#rigged-winner-display').text(riggedWinner);
-                } else {
-                    $('#rigged-indicator').hide();
-                }
             }
             
             // Populate entries in the form
@@ -789,7 +756,6 @@
                 // Redraw wheel
                 colors = generateColors(entries.length);
                 drawWheel();
-                updateRiggedIndicator();
                 
                 // Hide form
                 $('#form-container').hide();
